@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TopielApp.DTO
 {
@@ -13,5 +14,16 @@ namespace TopielApp.DTO
         public decimal Cost { get; set; } = 0;
         [Range(0, 100)]
         public int Progress { get; set; } = 0;
+
+        /////////////////////////////////////////////////////
+        
+        [Required(AllowEmptyStrings = true), DisplayFormat(ConvertEmptyStringToNull = false)]
+        public string? ImageName { get; set; }
+
+        [NotMapped]
+        public IFormFile ImageFile { get; set; }
+
+        [NotMapped]
+        public string ImageSrc { get; set; }
     }
 }

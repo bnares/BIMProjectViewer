@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TopielApp.Entities
 {
@@ -16,6 +17,17 @@ namespace TopielApp.Entities
         public int Progress { get; set; }
 
         public List<ToDo> ToDos { get; set; } = new List<ToDo>();
+
+        [Required(AllowEmptyStrings = true), DisplayFormat(ConvertEmptyStringToNull =false)]
+        public string? ImageName  { get; set; }
+
+        [NotMapped]
+        public IFormFile ImageFile { get; set; }
+
+        [NotMapped]
+        public string ImageSrc { get; set; }
+
+
 
 
     }

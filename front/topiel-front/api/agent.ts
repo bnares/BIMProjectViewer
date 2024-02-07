@@ -53,7 +53,7 @@ const request = {
 const project = {
     allProject: ()=>request.get("Project/allProjects"),
     getProject: (id:number)=>request.get(`Project/getProject/${id}`),
-    addProject: (data:{})=>request.post("Project/newProject",data)
+    addProject: (data:any)=>request.post("Project/newProject",data)
 
 }
 

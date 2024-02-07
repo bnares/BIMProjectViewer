@@ -25,7 +25,7 @@ namespace TopielApp.Entities
                 item.Property(x => x.UserRole).HasColumnType("varchar(20)").IsRequired();
                 item.Property(x => x.FinishDate).HasColumnType("varchar(30)");
                 item.HasMany(x=>x.ToDos).WithOne().OnDelete(DeleteBehavior.Cascade);
-                item.HasData(new Project() { Name = "Test Project", Description = "test Description", Cost = 1000000.99M, Status = "Active", UserRole = "Developer", FinishDate = "2024-12-28", Id=1, Progress=25 });
+                //item.HasData(new Project() { Name = "Test Project", Description = "test Description", Cost = 1000000.99M, Status = "Active", UserRole = "Developer", FinishDate = "2024-12-28", Id=1, Progress=25 });
             });
 
             builder.Entity<ToDo>(item => {

@@ -19,6 +19,14 @@ import { Button, Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 function ProjectCard(props : Project) {
+  const [fileExist, setFileExist] = React.useState(false);
+  const path = "https://localhost:7131/images/";
+  React.useEffect(()=>{
+    
+    console.log("image: ",props);
+    //var file = new File(`${path}${props.ImageName}`);
+
+  },[])
   return (
     <Card sx={{ maxWidth: 345 }}>
     <CardHeader
@@ -38,7 +46,7 @@ function ProjectCard(props : Project) {
     <CardMedia
       component="img"
       height="120"
-      image="./public/vite.svg"
+      image= {props.imageSrc ? props.imageSrc :"./public/vite.svg"}
       alt="Project BIM Photo"
     />
     <CardContent>

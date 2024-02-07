@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using System.Text.Json.Serialization;
 using TopielApp.Entities;
 
@@ -26,6 +27,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseStaticFiles(new StaticFileOptions //enabling static file to be able to updated and stor files
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Images")), //creating a path to Images folder where we store photos
+    RequestPath = "/Images", //aling with file provider we need to add requestPath to retrive photos from the folder
+
+
+});
 
 app.UseCors(opt =>
 {

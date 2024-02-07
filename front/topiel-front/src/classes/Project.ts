@@ -10,6 +10,9 @@ export interface IProject{
     cost: number,
     progress: number,
     id: number,
+    imageName: string,
+    imageSrc: string,
+    imageFile: null | File
 }
 
 export class Project implements IProject {
@@ -22,6 +25,10 @@ export class Project implements IProject {
     progress: number=0
     id: number=0
 
+    imageName: string =""
+    imageSrc: string=""
+    imageFile: null | File = null
+
     constructor(data: IProject){
         this.name = data.name;
         this.description = data.description;
@@ -30,7 +37,10 @@ export class Project implements IProject {
         this.finishDate = data.finishDate;
         this.cost = data.cost;
         this.progress = data.progress;
-        this.id = data.id
-        
+        this.id = data.id;
+
+        this.imageName = data.imageName;
+        this.imageSrc = data.imageSrc;
+        this.imageFile = data.imageFile;
     }
 }

@@ -10,17 +10,24 @@ import Stack from '@mui/material/Stack';
 import ProjectCard from './ProjectCard';
 import agent from "../../api/agent";
 import { Project } from '../classes/Project';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import NewProjectModal from './NewProjectModal';
 
 function HomePage() {
-    const [projects, setProjects] = React.useState(Project[{name:"Piotre", description:"des", status:'active', useRole: "architect", finishData:"2024-12-34",progress:34,cost:2000,id:44}]);
+    const [projects, setProjects] = React.useState(Project[{name:"Piotre", description:"des", status:'active', useRole: "architect", finishData:"2024-12-34",progress:34,cost:2000,id:44,ImageName:"test", ImageSrc:"testSrc", ImageFile:null}]);
+    const [openModal, setOpenModal] = React.useState<boolean>(false);
     React.useEffect(()=>{
         agent.project.allProject().then((resp)=>(setProjects(resp))).catch(e=>console.warn(e));
-    },[])
-    
+        
+    },[openModal])
+    console.log("Project: ", projects);
   return (
     <Grid container spacing={2}>
         <Grid item xs={2} style={{backgroundColor:"var(--background-100)", height:'100vh'}}>
             <Box style={{backgroundColor:"var(--background-100)", display:"flex", justifyContent:'center', flexDirection:"column", alignItems:'center'}}>
+                <Tooltip title="Add Project" style={{marginBottom:'20px'}}>
+                    <Button  variant='contained' onClick={()=>setOpenModal(true)} startIcon={<FileUploadIcon />}>New Project</Button>
+                </Tooltip>
                 <Tooltip title="Viewer">
                     <IconButton color='primary' size='large'>
                         <EngineeringIcon sx={{fontSize:'2rem'}}/>
@@ -39,6 +46,7 @@ function HomePage() {
                     {(projects.map((item : Project)=>(<Grid item xs={10} md={4} key={item.id}> <ProjectCard key={item.id} {...item}  /></Grid>)))}
                 </Grid>
             : <h1>LOading...</h1>}
+            {openModal ? <NewProjectModal openModal setOpenModal = {setOpenModal}  /> : null}
             
         </Grid>
 

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TopielApp.Entities;
 
@@ -10,9 +11,11 @@ using TopielApp.Entities;
 namespace TopielApp.Migrations
 {
     [DbContext(typeof(BIMAppContext))]
-    partial class BIMAppContextModelSnapshot : ModelSnapshot
+    [Migration("20240204163748_projectImageUpload")]
+    partial class projectImageUpload
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

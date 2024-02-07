@@ -164,7 +164,7 @@ export function IFCViewer(props: Project){
         });
 
         
-
+        var test = ifcLoader.uiElement.get("main").get().click();
         const toolbar = new OBC.Toolbar(viewer);
         toolbar.addChild(
             ifcLoader.uiElement.get("main"),
