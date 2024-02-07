@@ -25,5 +25,13 @@ namespace TopielApp.DTO
 
         [NotMapped]
         public string ImageSrc { get; set; }
+
+        [Required(AllowEmptyStrings = true), DisplayFormat(ConvertEmptyStringToNull = false)]
+        public string? IfcName { get; set; }
+
+        [NotMapped]
+        public IFormFile IfcFile { get; set; }
+        [NotMapped]
+        public string IfcSrc { get; set; }
     }
 }

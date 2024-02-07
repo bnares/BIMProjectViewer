@@ -22,11 +22,15 @@ export interface ModalProjectWindowData{
     setOpenModal: (value: boolean)=>void,
 }
 
-type imageValue = null | string | ArrayBuffer;
+type imageValue = null | string | ArrayBuffer | Blob;
+type ifcValue = null | string | ArrayBuffer | Blob;
 export interface ProjectFormData{
-    imageFile:null | File,
+    imageFile: Blob | null,
     imageSrc: imageValue,
     imageName: null | string,
+    ifcFile: null | File | Blob,
+    ifcSrc: ifcValue,
+    ifcName: string | null,
     name:string,
     description:string,
     status:string,
@@ -40,6 +44,9 @@ const initialValues:ProjectFormData  ={
     imageFile: null,
     imageSrc:"",
     imageName:null,
+    ifcFile: null,
+    ifcSrc:"",
+    ifcName: null,
     name:"",
     description:"",
     status: "active",
@@ -73,6 +80,7 @@ const style = {
 function NewProjectModal(props: ModalProjectWindowData) {
     const [errors, setErrors] = React.useState({
         imageSrc:false,
+        ifcSrc:false,
         name:false,
         description:false,
         status:false,
@@ -81,7 +89,7 @@ function NewProjectModal(props: ModalProjectWindowData) {
     });
     const [values, setValues] = React.useState(initialValues);
 
-    React.useEffect(()=>{},[errors.description, errors.name, errors.imageSrc, errors.finishDate, errors.progress, errors.status])
+    React.useEffect(()=>{},[errors.description, errors.name, errors.imageSrc, errors.finishDate, errors.progress, errors.status, errors.ifcSrc])
 
     const handleInputChange = (e:any)=>{
         const {name, value} = e.target;
@@ -101,6 +109,7 @@ function NewProjectModal(props: ModalProjectWindowData) {
         setValues(initialValues);
         setErrors({
             imageSrc:false,
+            ifcSrc:false,
             name:false,
             description:false,
             status:false,
@@ -109,7 +118,33 @@ function NewProjectModal(props: ModalProjectWindowData) {
         })
     }
 
-    const showPreview = (e: any)=>{
+    const onChangeIfcInput = (e: any)=>{
+        console.log("inside ifc on change");
+        if(e.target.files && e.target.files[0]){
+            console.log("inside if of ifc on change");
+            let ifcFile = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (x: any)=>{
+                let ifcSrc = x.target.result;
+                setValues({
+                    ...values,
+                    ifcFile,
+                    ifcSrc,
+                })
+            }
+            reader.readAsDataURL(ifcFile)
+        }else{
+            console.log("inside else of ifc on change");
+            setValues({
+                ...values,
+                ifcName:'',
+                ifcSrc:'',
+            })
+        }
+        console.log("after on change ifc on change: ",values);
+    }
+
+    const showPreviewImage = (e: any)=>{
         if(e.target.files && e.target.files[0]){
             let imageFile = e.target.files[0];
             const reader = new FileReader();
@@ -137,6 +172,7 @@ function NewProjectModal(props: ModalProjectWindowData) {
         values.imageSrc =="" ? errors.imageSrc = true : false;
         values.status=="" ? errors.status = true : false;
         values.finishDate=="" ? errors.finishDate = true : false;
+        values.ifcSrc ==""? errors.ifcSrc = true : false;
         
         if(Object.values(errors).every(x=>x==false)) return true;
         return false;
@@ -147,22 +183,27 @@ function NewProjectModal(props: ModalProjectWindowData) {
         console.log("inside submit");
         if(validateForm()){
 
-            
             const formData = new FormData();
             formData.append("name", values.name);
             formData.append("description", values.description);
             formData.append("status", values.status);
             formData.append("userRole", values.userRole);
+            formData.append("cost", values.cost);
             formData.append("finishDate", values.finishDate);
             formData.append('imageName', values.imageName);
             formData.append('imageFile', values.imageFile);
             formData.append('imageSrc', values.imageSrc);
             formData.append("progress", values.progress);
-            formData.append("cost", values.cost);
-            console.log("formData: ",formData);
-            agent.project.addProject(formData).then((resp)=>handleClose()).catch(e=>console.warn(e));
             
-    
+            formData.append("ifcName", values.ifcName);
+            formData.append("ifcFile", values.ifcFile);
+            formData.append("ifcSrc", values.ifcSrc);
+            //console.log("formData: ",formData);
+            agent.project.addProject(formData).then(()=>handleClose()).catch(e=>console.warn(e));
+            
+        }else{
+            console.log("errors:", errors);
+            alert("Form is not valid");
         }
 
     }
@@ -186,8 +227,8 @@ function NewProjectModal(props: ModalProjectWindowData) {
                     </Box>
                 </Box>
                 <FormControl>
-                    <label for="imageProject" style={{color:'black'}}>Select Project Photo</label>
-                    <input id="imageProject" style={{marginBottom:'10px'}}  type='file' required  onChange={showPreview} name='imageSrc' accept="image/*"/>
+                    <label htmlFor="imageProject" style={{color:'black'}}>Select Project Photo</label>
+                    <input id="imageProject" style={{marginBottom:'10px'}}  type='file' required  onChange={showPreviewImage} name='imageSrc' accept="image/*"/>
                     {errors.imageSrc ? <FormHelperText style={{color:'red'}}>Select Image File</FormHelperText> : null}
                     
                     <TextField 
@@ -250,8 +291,8 @@ function NewProjectModal(props: ModalProjectWindowData) {
                           }}         
                     />
                     {errors.finishDate && <FormHelperText style={{color:'red'}}>Fill in Progress</FormHelperText>}
-                    <label for="ifcProjectFile" style={{color:'black'}}>Select IFC File</label>
-                    <input id='ifcProjectFile' style={{marginBottom:'10px'}}  type='file' required  onChange={showPreview} name='imageSrc' accept=".ifc"/>
+                    <label htmlFor="ifcProjectFile" style={{color:'black'}}>Select IFC File</label>
+                    <input id='ifcProjectFile' style={{marginBottom:'10px'}}  type='file' required  onChange={onChangeIfcInput} name='ifcSrc' accept=".ifc"/>
                     {errors.imageSrc ? <FormHelperText style={{color:'red'}}>Select Image File</FormHelperText> : null}
                     <Box display="flex" justifyContent="center" alignItems="center" gap="10px">
                         <Button variant='contained' color='error' startIcon={<CancelIcon />} onClick={handleClose}>Cancel</Button>

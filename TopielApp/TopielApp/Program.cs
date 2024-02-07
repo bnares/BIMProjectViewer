@@ -36,6 +36,14 @@ app.UseStaticFiles(new StaticFileOptions //enabling static file to be able to up
 
 });
 
+app.UseStaticFiles(new StaticFileOptions //enabling static file to be able to updated and stor files
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Ifc")), //creating a path to Images folder where we store photos
+    RequestPath = "/Ifc", //aling with file provider we need to add requestPath to retrive photos from the folder
+
+
+});
+
 app.UseCors(opt =>
 {
     opt.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");

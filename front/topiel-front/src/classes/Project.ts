@@ -12,7 +12,10 @@ export interface IProject{
     id: number,
     imageName: string,
     imageSrc: string,
-    imageFile: null | File
+    imageFile: null | File,
+    ifcName: string,
+    ifcFile: any,
+    ifcSrc: string,
 }
 
 export class Project implements IProject {
@@ -29,6 +32,10 @@ export class Project implements IProject {
     imageSrc: string=""
     imageFile: null | File = null
 
+    ifcFile: any =null
+    ifcSrc: string = ""
+    ifcName: string=""
+
     constructor(data: IProject){
         this.name = data.name;
         this.description = data.description;
@@ -42,5 +49,9 @@ export class Project implements IProject {
         this.imageName = data.imageName;
         this.imageSrc = data.imageSrc;
         this.imageFile = data.imageFile;
+
+        this.ifcFile = data.ifcFile;
+        this.ifcSrc = data.ifcSrc;
+        this.ifcName = data.ifcName;
     }
 }

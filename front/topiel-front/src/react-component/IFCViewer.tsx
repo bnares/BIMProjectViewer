@@ -45,6 +45,8 @@ export function IFCViewer(props: Project){
     const navigate = useNavigate();
     let viewer : OBC.Components;
 
+    console.log("props: ",props);
+
     const createViewer = async ()=>{
         viewer = new OBC.Components();
         setViewer(viewer);
@@ -164,7 +166,7 @@ export function IFCViewer(props: Project){
         });
 
         
-        var test = ifcLoader.uiElement.get("main").get().click();
+        //var test = ifcLoader.uiElement.get("main").get().click();
         const toolbar = new OBC.Toolbar(viewer);
         toolbar.addChild(
             ifcLoader.uiElement.get("main"),

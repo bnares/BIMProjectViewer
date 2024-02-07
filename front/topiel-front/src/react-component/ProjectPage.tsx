@@ -20,9 +20,12 @@ function ProjectPage() {
     cost : 0,
     progress:0,
     id:0,
-    ImageFile:null,
-    ImageName:"",
-    ImageSrc:''
+    imageFile:null,
+    imageName:"",
+    imageSrc:'',
+    ifcFile:null,
+    ifcName:"",
+    ifcSrc:"",
   })
   var {id}  = useParams();
   const navigate = useNavigate();
