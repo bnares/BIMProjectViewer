@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import agent from '../../api/agent';
 import * as THREE from "three"
 import { Project } from '../classes/Project';
+import axios, { AxiosResponse } from 'axios';
 
 interface IViewerContext{
     viewer: OBC.Components | null,
@@ -40,23 +41,52 @@ export function ViewerProvider(props: {children: React.ReactNode}){
 
 
 export function IFCViewer(props: Project){
-    const {setViewer} = React.useContext(ViewerContext);
+    //const {setViewer} = React.useContext(ViewerContext);
     const {id} = useParams();
+    const [fileData, setFileData] = React.useState<Blob | null>(null);
+    const [modelDownloaded, setModelDownloaded] = React.useState<boolean>(false);
+    const [ifcLoader, setIfcLoader] = React.useState<OBC.FragmentIfcLoader | null>(null);
     const navigate = useNavigate();
-    let viewer : OBC.Components;
+    const [viewer, setViewer] = React.useState< OBC.Components | null>( null);
+    const [viewerScene, setViewerScene] = React.useState<THREE.Scene | null>(null);
+    const [initialize, setInitialize] = React.useState<boolean>(false);
 
     console.log("props: ",props);
 
-    const createViewer = async ()=>{
-        viewer = new OBC.Components();
-        setViewer(viewer);
+    const downloadFile = async () => {
+        var testName = "NAV-IPI-ET242736339.ifc";
+        var fileName = props.ifcName;
+        console.log("props fileName: ",fileName);
+        if(props.ifcName){
+            try {
+                // const response: AxiosResponse<Blob> = await agent.project.getFileModel(props.ifcName,{
+                //     responseType:"blob",
+                // });
+                const response: AxiosResponse<Blob> = await axios.get(`https://localhost:7131/api/Project/ifc/${props.ifcName}`, {
+                    responseType: 'blob',
+                });
+    
+                if (response.status === 200) {
+                    setFileData(response.data);
+                    setModelDownloaded(true);
+                } else {
+                    console.error('Failed to download Ifc file.');
+                }
+            } catch (error) {
+                console.error('Error downloading Ifc file:', error);
+            }
+        }
+        
+    };
+
+   const createBimViewer = async (viewerContainer : HTMLDivElement)=>{
+        let viewer : OBC.Components  = new OBC.Components;
         const sceneComponent = new OBC.SimpleScene(viewer);
         sceneComponent.setup();
         viewer.scene = sceneComponent;
         const scene = sceneComponent.get();
+        setViewerScene(scene);
         scene.background = null;
-
-        const viewerContainer = document.getElementById("viewer-container") as HTMLDivElement;
         const rendereComponent = new OBC.PostproductionRenderer(viewer, viewerContainer);
         viewer.renderer = rendereComponent;
 
@@ -69,20 +99,7 @@ export function IFCViewer(props: Project){
         viewer.init();
         cameraComponent.updateAspect();
         rendereComponent.postproduction.enabled = true;
-
         const fragmentManager = new OBC.FragmentManager(viewer);
-
-        const exportFragments = (model: FragmentsGroup)=>{
-            const fragmentBinary = fragmentManager.export(model);
-            const blob = new Blob([fragmentBinary]);
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${model.name.replace(".ifc","")}.frag`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
         const highlighter = new OBC.FragmentHighlighter(viewer);
         highlighter.setup();
 
@@ -150,12 +167,19 @@ export function IFCViewer(props: Project){
             }else{
                 navigate("/not-found");
             }
-            
         }
 
-        
+        const getIfcFile = async ()=>{
+            const file = await fetch(props.ifcSrc);
+            const data = await file.arrayBuffer();
+            const buffer = new Uint8Array(data);
+            const model = await ifcLoader.load(buffer,"example");
+            var test = viewer.scene.get();
+            test.add(model);
+        }
 
         const ifcLoader = new OBC.FragmentIfcLoader(viewer);
+        setIfcLoader(ifcLoader);
         ifcLoader.settings.wasm = {
             path: "https://unpkg.com/web-ifc@0.0.43/",
             absolute: true
@@ -165,8 +189,6 @@ export function IFCViewer(props: Project){
             onModelLoaded(model);
         });
 
-        
-        //var test = ifcLoader.uiElement.get("main").get().click();
         const toolbar = new OBC.Toolbar(viewer);
         toolbar.addChild(
             ifcLoader.uiElement.get("main"),
@@ -174,23 +196,89 @@ export function IFCViewer(props: Project){
             taskItem.uiElement.get("activationButton"),
         )
         viewer.ui.addToolbar(toolbar);
-    }
+        return viewer;
+
+   }
+
+    const loadIfcFile = async (fileData : Blob, ifcLoader : OBC.FragmentIfcLoader) => {
+        try {
+
+            const file = await fileData.arrayBuffer();
+            const buffer = new Uint8Array(file);
+            
+            const model = await ifcLoader.load(buffer, props.name);
+            console.log("model: ",model);
+            if(viewerScene instanceof THREE.Scene){
+                viewerScene.add(model);
+                
+            }
+            
+        } catch (error) {
+            console.error("Error loading Ifc file:", error);
+            console.log()
+           
+        }
+    };
 
     React.useEffect(()=>{
-        createViewer();
-        return ()=>{
-            viewer.dispose();
-            setViewer(null);
+        if(!initialize){
+            downloadFile();
+            
+            let IfcViewer : OBC.Components | undefined = undefined;
+            const viewerContainer = document.getElementById("viewer-container") as HTMLDivElement; 
+            const initialize = async (IfcContainer : HTMLDivElement)=> {
+                IfcViewer = (await createBimViewer(IfcContainer)) as OBC.Components;
+                if(!IfcViewer) return;
+                else{
+                    setInitialize(true);
+                }
+            }
+
+            if(viewerContainer){
+                initialize(viewerContainer);
+                
+            }
+            if(fileData && ifcLoader){
+                loadIfcFile(fileData, ifcLoader);   
+            }
         }
-    },[])
+        
+        //loadIfcFile(viewer);
+        return ()=>{
+            if(viewer !=null){
+                viewer.dispose();
+                setViewer(null);
+            }
+        }
+    },[initialize])
+
+    React.useEffect(()=>{
+        downloadFile();
+        if(modelDownloaded){
+            console.log("blob data: ",fileData);
+            if(fileData instanceof Blob && ifcLoader instanceof OBC.FragmentIfcLoader && viewerScene instanceof THREE.Scene ){
+                loadIfcFile(fileData, ifcLoader);
+                setInitialize(true);
+            }else{
+                alert("Not right file ");
+            }
+            
+        }
+
+    },[JSON.stringify(props), modelDownloaded, ifcLoader, viewerScene])
 
     return(
-    <div
-      id="viewer-container"
-      className="dashboard-card"
-      style={{ minWidth: 0, position: "relative" }}
-    >
-       
-    </div>
+        <>
+            
+            <div
+                id="viewer-container"
+                className="dashboard-card"
+                style={{ minWidth: 0, position: "relative" }}
+            >
+           
+            </div>
+            
+            
+        </>
     )
 }

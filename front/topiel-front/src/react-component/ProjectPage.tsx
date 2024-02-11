@@ -53,10 +53,10 @@ function ProjectPage() {
             <Grid item xs={2}>
                 {(loading) ? <CircularProgress color="success" /> : <BasicInfo {...project}/>}
             </Grid>
-            <Grid item xs={10}>
-                <div style={{height:'60%!important'}}>
+            <Grid item xs={10} >
+                
                   <IFCViewer {...project}/>
-                </div>
+               
             </Grid>
         </Grid>
     </>

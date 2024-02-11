@@ -69,6 +69,23 @@ namespace TopielApp.Controllers
             return Ok(project);
         }
 
+
+        [HttpGet("ifc/{ifcFileName}")]
+        public IActionResult GetIfcFile(string ifcFileName)
+        {
+            var filePath = Path.Combine("ifc", ifcFileName);
+
+            if (System.IO.File.Exists(filePath))
+            {
+                var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                return File(fileStream, "application/octet-stream", ifcFileName);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
         [HttpPost("newProject")]
         public async Task<ActionResult<Project>> CreateProject([FromForm]ProjectDto dto)
         {
@@ -107,6 +124,8 @@ namespace TopielApp.Controllers
             return BadRequest(new ProblemDetails() { Title = "Cant save data, sth went wrong" });
 
         }
+
+
 
 
         [NonAction]

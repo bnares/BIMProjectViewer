@@ -173,11 +173,13 @@ export class AsignTask extends OBC.Component<Task[]> implements OBC.UI{
     async setup(){
         const highlighter = await this._components.tools.get(OBC.FragmentHighlighter);
         const priorityData = ["Low", "Normal", "High"];
+
         // for(var user of this._userList){
         //     highlighter.add(`${AsignTask.uuid}-${user.name}`, [new THREE.MeshStandardMaterial({color:this.setBg()})])
         // }
         for(var priority of priorityData){
-            highlighter.add(`${AsignTask.uuid}-priority-${priority}`,[new THREE.MeshStandardMaterial({color:this.setBg()})])
+            console.log('filter name: ',priority+" "+this._projectData.name);
+            highlighter.add(`${AsignTask.uuid}-priority-${priority}-${this._projectData.name}`,[new THREE.MeshStandardMaterial({color:this.setBg()})])
         }
     }
 

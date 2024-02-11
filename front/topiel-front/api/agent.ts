@@ -53,7 +53,8 @@ const request = {
 const project = {
     allProject: ()=>request.get("Project/allProjects"),
     getProject: (id:number)=>request.get(`Project/getProject/${id}`),
-    addProject: (data:any)=>request.post("Project/newProject",data)
+    addProject: (data:any)=>request.post("Project/newProject",data),
+    getFileModel: (fileName: string, config?: any)=>request.get(`Project/ifc/${fileName}`, config),
 
 }
 

@@ -28,7 +28,7 @@ function ProjectCard(props : Project) {
 
   },[])
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ maxWidth: '340px', minHeight:'340px', maxHeight:'380px' }}>
     <CardHeader
       avatar={
         <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
@@ -45,7 +45,7 @@ function ProjectCard(props : Project) {
     />
     <CardMedia
       component="img"
-      height="120"
+      height="50%"
       image= {props.imageSrc ? props.imageSrc :"./public/vite.svg"}
       alt="Project BIM Photo"
     />
